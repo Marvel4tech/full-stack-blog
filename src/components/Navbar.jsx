@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Image from './Image'
 import { Link } from 'react-router-dom'
-import { SignedIn, SignInButton, SignedOut, UserButton } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
 
 
 const Navbar = () => {
@@ -36,6 +36,7 @@ const Navbar = () => {
 
         {/* DESKTOP MENU */}
         <div className=' hidden md:flex items-center gap-8 xl:gap-12 font-medium'>
+            <Link to={"/"}>Home</Link>
             <Link to={"/"}>Trending</Link>
             <Link to={"/"}>Most Popular</Link>
             <Link to={"/"}>About</Link>
