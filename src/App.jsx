@@ -6,7 +6,6 @@ const App = () => {
       {/* NAVBAR */}
       <Navbar />
 
-      
       {/* BREADCRUMB */}
       {/* INTRODUCTION */}
       {/* FEATURED POSTS */}
