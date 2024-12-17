@@ -7,10 +7,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Marvellous Ayomike",
   "license": "ISC",
-  "description": "",
+  "description": "Blog",
   "dependencies": {
-    "express": "^5.0.1"
+    "dotenv": "^16.4.7",
+    "express": "^5.0.1",
+    "mongoose": "^8.9.1"
   }
 }
