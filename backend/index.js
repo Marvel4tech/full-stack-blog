@@ -9,6 +9,7 @@ dotenv.config()
 dbConnect() 
 
 const app = express()
+app.use(express.json())
 
 app.use("/users", userRoute)
 app.use("/posts", postRoute)
