@@ -11,8 +11,10 @@
   "license": "ISC",
   "description": "Blog",
   "dependencies": {
+    "body-parser": "^2.0.2",
     "dotenv": "^16.4.7",
     "express": "^5.0.1",
-    "mongoose": "^8.9.1"
+    "mongoose": "^8.9.1",
+    "svix": "^1.44.0"
   }
 }
