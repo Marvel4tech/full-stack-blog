@@ -1,4 +1,5 @@
 import express from "express"
+import { clerkMiddleware, requireAuth } from "@clerk/express"
 import dbConnect from "./config/dbConnection.js"
 import dotenv from "dotenv"
 import userRoute from "./routes/userRoute.js"
@@ -10,8 +11,24 @@ dotenv.config()
 dbConnect() 
 
 const app = express()
+app.use(clerkMiddleware())
 app.use("/webhooks", webhookRoute)
 app.use(express.json())
+
+/* app.get("/protect", (req, res) => {
+   const { userId } = req.auth;
+   if(!userId) {
+    res.status(401).json({ message: "User not authenticated" });
+   }
+   res.status(200).json("content")
+})
+
+//Alternatively Using requireAuth middleware in express 5
+app.get("/protect2", requireAuth(), (req, res) => {
+   res.status(200).json("content")
+})
+*/
+
 
 app.use("/users", userRoute)
 app.use("/posts", postRoute)

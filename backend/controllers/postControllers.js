@@ -1,4 +1,5 @@
 import Post from "../models/postModel.js"
+import User from "../models/userModel.js"
 
 export const getAllPosts = async (req, res) => {
    const post = await Post.find()
@@ -23,11 +24,27 @@ export const getSinglePost = async (req, res) => {
 }
 
 export const createPost = async (req, res) => {
-    const { title, slug, user, content,  } = req.body;
+    const clerkUserId = req.auth.userId;
+    console.log("Authenticated User ID:", clerkUserId); //Debugging
+
+    console.log(req.headers)
+
+    if (!clerkUserId) {
+        return res.status(401).json({ message: "User not authenticated" });
+    }
+
+    const userIdentity = await User.findOne({clerkUserId})
+    console.log("User  Identity:", userIdentity); // Debugging
+    if (!userIdentity) {
+        return res.status(404).json({ message: "User not found" });
+    }
+
+
+    const { title, slug, content,  } = req.body;
     const post = await Post.create({
+        user: userIdentity._id,
         title,
         slug,
-        user,
         content,
     })
     console.log("Post added successfully", post)
@@ -35,7 +52,45 @@ export const createPost = async (req, res) => {
  }
 
  export const deletePost = async (req, res) => {
-    const { id } = req.params.id;
-    const post = await Post.findByIdAndDelete( id )
-    res.status(200).json("Post Deleted Successfully")
+    const clerkUserId = req.auth.userId;
+    console.log("Authenticated User ID:", clerkUserId); // Debugging
+    
+    const { id } = req.params;
+
+     // Check if the user is authenticated
+     if (!clerkUserId) {
+        return res.status(401).json({ message: "User  not authenticated" });
+    }
+
+    try {
+        // Find the user in your database using the Clerk user ID
+        const userIdentity = await User.findOne({ clerkUserId: clerkUserId });
+        if (!userIdentity) {
+            return res.status(404).json({ message: "User  not found" });
+        }
+
+        // Find the post by ID
+        const post = await Post.findById(id);
+        
+        // Check if the post exists
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        console.log("Post User ID:", post.user.toString()); // Log the post's user ID
+        console.log("Clerk User ID:", clerkUserId); // Log the authenticated user's ID
+
+
+        // Check if the authenticated user is the owner of the post
+        if (post.user.toString() !== userIdentity._id.toString()) {
+            return res.status(403).json({ message: "You are not authorized to delete this post" });
+        }
+
+        // Delete the post
+        await Post.findByIdAndDelete(id);
+        res.status(200).json({ message: "Post deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting post:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
  }
