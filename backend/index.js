@@ -6,11 +6,14 @@ import userRoute from "./routes/userRoute.js"
 import postRoute from "./routes/postRoute.js"
 import commentRoute from "./routes/commentRoute.js"
 import webhookRoute from "./routes/webhookRoute.js"
+import cors from "cors"
 
 dotenv.config()
 dbConnect() 
 
 const app = express()
+
+app.use(cors(process.env.CLIENT_URL))
 app.use(clerkMiddleware())
 app.use("/webhooks", webhookRoute)
 app.use(express.json())
