@@ -11,6 +11,7 @@ import SinglePostPage from './routes/SinglePostPage.jsx'
 import MainLayouts from './layouts/MainLayouts.jsx'
 import { ClerkProvider } from '@clerk/clerk-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ToastContainer } from 'react-toastify';
 
 const queryClient = new QueryClient()
 
@@ -60,6 +61,7 @@ createRoot(document.getElementById('root')).render(
     <ClerkProvider publishableKey={publishableKey}>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
+        <ToastContainer />
       </QueryClientProvider>
     </ClerkProvider>
   </StrictMode>,
