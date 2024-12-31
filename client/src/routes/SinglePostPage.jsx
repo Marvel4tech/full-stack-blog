@@ -112,7 +112,7 @@ const SinglePostPage = () => {
             </div>
         </div>
       </div>
-      <Comments />
+      <Comments postId={data._id} />
     </div>
   )
 }
