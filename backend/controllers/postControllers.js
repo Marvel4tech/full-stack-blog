@@ -21,7 +21,7 @@ export const getAllPosts = async (req, res) => {
 }
 
 export const getSinglePost = async (req, res) => {
-    const post = await Post.findOne({ slug: req.params.slug })
+    const post = await Post.findOne({ slug: req.params.slug }).populate("user", "username img")
     res.status(200).json(post)
 
     /* A BETTER ALTERNATIVE METHOD
