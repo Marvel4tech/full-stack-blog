@@ -2,15 +2,29 @@ import { useAuth, useUser } from '@clerk/clerk-react'
 import 'react-quill-new/dist/quill.snow.css';
 import ReactQuill from 'react-quill-new';
 import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
+import Upload from '../components/Upload';
 
 const Write = () => {
   const { isLoaded, isSignedIn } = useUser()
   const { getToken } = useAuth()
   const [value, setValue] = useState("")
+
+  const [cover, setCover] = useState("")
+  const [img, setImg] = useState("")
+  const [video, setVideo] = useState("")
+  const [progress, setProgress] = useState(0)
+
+  useEffect(() => {
+    img && setValue(prev => prev+`<p><image src="${img.url}"/></p>`)
+  }, [img])
+
+  useEffect(() => {
+    video && setValue(prev => prev+`<p><iframe class="ql-video" src="${video.url}"/></p>`)
+  }, [video])
 
   const navigate = useNavigate()
 
@@ -44,6 +58,7 @@ const Write = () => {
     const formData = new FormData(e.target)
 
     const data = {
+      img: cover.filePath || "",
       title: formData.get('title'),
       category: formData.get('category'),
       desc: formData.get('desc'),
@@ -58,7 +73,11 @@ const Write = () => {
     <div className=' h-[calc(100vh-64px)] md:h-[calc(100vh-80px)] flex flex-col gap-6'>
         <h1 className=' text-xl font-light'>Create a New Post</h1>
         <form onSubmit={handleSubmit} className=' flex flex-col gap-6 flex-1 mb-6'>
-            <button className='w-max p-2 shadow-md rounded-xl text-sm text-gray-500 bg-white'>Add a Cover Image</button>
+            <Upload type={"image"} setProgress={setProgress} setData={setCover}>
+              <button className='w-max p-2 shadow-md rounded-xl text-sm text-gray-500 bg-white'>
+                Add a Cover Image
+              </button>
+            </Upload>
             <input 
               type="text" 
               placeholder=' Title'
@@ -81,11 +100,28 @@ const Write = () => {
               placeholder=' A Short Description' 
               className=' p-4 rounded-xl bg-white shadow-md'
             />
-            <ReactQuill theme='snow' className=' flex-1 rounded-xl bg-white shadow-md' value={value} onChange={setValue} />
-            <button disabled={mutation.isPending} className=' bg-blue-800 p-2 text-white font-medium rounded-xl w-36 mt-4 
+            <div className=' flex-1 flex'>
+              <div className=' flex flex-col gpa-2 mr-2'>
+                <Upload type={"image"} setProgress={setProgress} setData={setImg}>
+                  🎆
+                </Upload>
+                <Upload type={"video"} setProgress={setProgress} setData={setVideo}>
+                  ▶️
+                </Upload>
+              </div>
+              <ReactQuill 
+                theme='snow' 
+                className=' flex-1 rounded-xl bg-white shadow-md' 
+                value={value} 
+                onChange={setValue}
+                readOnly={0 < progress && progress < 100}
+              />
+            </div>
+            <button disabled={mutation.isPending || (0 < progress && progress < 100)} className=' bg-blue-800 p-2 text-white font-medium rounded-xl w-36 mt-4 
             disabled:bg-blue-400 disabled:cursor-not-allowed'>
               {mutation.isPending ? "Loading..." : "Send"}
             </button>
+            {"Progress:" + progress}
             {mutation.isError && <span> {mutation.error.message} </span>}
         </form>
     </div>

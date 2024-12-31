@@ -1,8 +1,10 @@
 import { Router } from "express";
-import { createPost, deletePost, getAllPosts, getSinglePost } from "../controllers/postControllers.js";
+import { createPost, deletePost, getAllPosts, getSinglePost, uploadAuth } from "../controllers/postControllers.js";
 
 
 const router = Router()
+
+router.get("/upload-auth", uploadAuth)
 
 router.get("/", getAllPosts)
 router.get("/:slug", getSinglePost)
