@@ -84,9 +84,13 @@ const PostMenuAction = ({ post }) => {
   return (
     <div>
         <h1 className=' text-sm mt-8 mb-4 font-medium'>Actions</h1>
-        { isPending ? "Loading..." : error ? "failed to fetch saved post" : <div onClick={handleSave} className=' flex items-center gap-2 py-2 text-sm cursor-pointer'>
-            <span className={`${isSaved ? "border border-green-600 p-3" : ""}`} aria-label={isSaved ? "Saved" : "Not Saved"}>✅</span>
-            <span>Save this Post</span>
+        { isPending ? "Loading..." : error ? "failed to fetch saved post" : <div onClick={handleSave} className=' flex items-center 
+        gap-2 py-2 text-sm cursor-pointer'>
+            <span>✅</span>
+            <span className={saveMutation.isPending ? isSaved ? "" : "border border-green-600 py-1 px-3" : `${isSaved ? "border border-green-600 py-1 px-3" : ""}`} aria-label={isSaved ? "Saved" : "Not Saved"}>
+              Save this Post
+            </span>
+            {saveMutation.isPending && <span className=' text-sm'>(in progress)</span>}
         </div>}
         {user && (post.user.username === user.username) && <div onClick={handleDelete} className=' flex items-center gap-2 py-2 text-sm cursor-pointer'>
             <span>❌</span>
