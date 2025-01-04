@@ -45,17 +45,17 @@ const Comments = ({ postId }) => {
   });
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault() //
 
-    const formData = new FormData(e.target)
+    const formData = new FormData(e.target) //
 
     const data = {
-      desc: formData.get("desc")
+      desc: formData.get("desc") //
     }
 
-    console.log("Form data:", data);
+    console.log("Form data:", data); //
 
-    mutation.mutate(data)
+    mutation.mutate(data) //
   }
 
   return (
@@ -92,7 +92,7 @@ const Comments = ({ postId }) => {
           }
 
           {data.map((comment) => (
-            <Comment key={comment._id} comment={comment} />
+            <Comment key={comment._id} comment={comment} postId={postId} />
           ))}
         </>
 

@@ -80,13 +80,20 @@ export const createPost = async (req, res) => {
 
 export const deletePost = async (req, res) => {
     const clerkUserId = req.auth.userId;
-    console.log("Authenticated User ID:", clerkUserId); // Debugging
-    
+        console.log("Authenticated User ID:", clerkUserId); // Debugging
     const { id } = req.params;
 
      // Check if the user is authenticated
-     if (!clerkUserId) {
+    if (!clerkUserId) {
         return res.status(401).json({ message: "User  not authenticated" });
+    }
+
+    //allowing admin to delete post
+    const role = req.auth.sessionClaims?.metadata?.role || "user"
+    if (role === "admin") {
+        // Admin role can delete any post
+        await Post.findByIdAndDelete(req.params.id);
+        return res.status(200).json("Post deleted successfully");
     }
 
     try {
@@ -120,6 +127,35 @@ export const deletePost = async (req, res) => {
         console.error("Error deleting post:", error);
         res.status(500).json({ message: "Server error", error: error.message });
     }
+}
+
+export const featurePost = async (req, res) => {
+    const clerkUserId = req.auth.userId
+    const postId = req.body.postId
+
+    if (!clerkUserId) {
+        return res.status(401).json({ message: "User not authenticated" });
+    }
+
+    const role = req.auth.sessionClaims?.metadata?.role || "user"
+
+    if (role !== "admin") {
+        return res.status(403).json("You can not feature posts");
+    }
+
+    const post = await Post.findById(postId)
+
+    if (!post) {
+        return res.status(404).json("Post not found");
+    }
+
+    const isFeatured = post.isFeatured
+
+    const updatedPost = await Post.findByIdAndUpdate(postId, {isFeatured: !isFeatured}, {new: true})
+
+    res.status(200).json(updatedPost)
+
+
 }
 
 

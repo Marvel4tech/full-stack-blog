@@ -11,7 +11,7 @@ export const addComment = async (req, res) => {
     const postId = req.params.postId
 
     if (!clerkUserId) {
-        return res.status(401).json("User not authenticated");
+        return res.status(401).json({ error: "User  not authenticated" });
     }
 
     const user = await User.findOne({clerkUserId})
@@ -20,16 +20,35 @@ export const addComment = async (req, res) => {
         return res.status(404).json("User  not found");
     }
 
-    const newComment = new Comment({
-        ...req.body,
-        user: user._id,
-        post: postId
-    })
-    const savedComment = await newComment.save()
+    // allow admin to add comment
+    const role = req.auth.sessionClaims?.metadata?.role || "user";
+    
+    if (role === "admin") {
+        const newComment = new Comment({
+            ...req.body,
+            user: user._id, // Admin can add comments as themselves or specify another user
+            post: postId
+        });
+    
+        const savedComment = await newComment.save();
 
-    setTimeout(() => {
-        res.status(201).json(savedComment)
-    }, 3000)
+        setTimeout(() => {
+            res.status(201).json(savedComment);
+        }, 3000);
+    } else {
+        // For regular users, proceed as usual
+        const newComment = new Comment({
+            ...req.body,
+            user: user._id,
+            post: postId
+        })
+        const savedComment = await newComment.save()
+    
+        setTimeout(() => {
+            res.status(201).json(savedComment)
+        }, 3000)
+    }
+    
 }
 
 export const deleteComment = async (req, res) => {
@@ -38,6 +57,13 @@ export const deleteComment = async (req, res) => {
 
     if (!clerkUserId) {
         return res.status(401).json("User not authenticated");
+    }
+
+    // allowing admin to delete comment
+    const role = req.auth.sessionClaims?.metadata?.role || "user"
+    if (role === "admin") {
+        await Comment.findByIdAndDelete(req.params.id);
+        return res.status(200).json("Comment deleted successfully");
     }
 
     const user = await User.findOne({clerkUserId})

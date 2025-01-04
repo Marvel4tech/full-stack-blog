@@ -22,6 +22,8 @@ const PostMenuAction = ({ post }) => {
     }
   })
 
+  const isAdmin = user?.publicMetadata?.role || false //Role Validation
+
   const isSaved = savedPosts?.data?.some((p) => p === post._id) || false;
 
   const deleteMutation = useMutation({
@@ -73,6 +75,33 @@ const PostMenuAction = ({ post }) => {
     }
   })
 
+  const featureMutation = useMutation({
+    mutationFn: async () => {
+      const token = await getToken()
+      return axios.patch(`${import.meta.env.VITE_API_URL}/posts/feature`, 
+        {
+          postId: post._id
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["post", post.slug] })
+    },
+    onError: (error) => {
+      toast.error(error.response.data)
+      console.error("Error deleting post:", error)
+    }
+  })
+
+  const handlefeature = () => {
+    featureMutation.mutate()
+  }
+
   const handleSave = () => {
     console.log("Save button clicked")
     if (!user) {
@@ -92,7 +121,17 @@ const PostMenuAction = ({ post }) => {
             </span>
             {saveMutation.isPending && <span className=' text-sm'>(in progress)</span>}
         </div>}
-        {user && (post.user.username === user.username) && <div onClick={handleDelete} className=' flex items-center gap-2 py-2 text-sm cursor-pointer'>
+        { isAdmin && (
+          <div className=' flex items-center gap-2 py-2 text-sm cursor-pointer' onClick={handlefeature}>
+            <span>⭐️</span>
+            <span>
+              Feature
+            </span>
+            {featureMutation.isPending && <span className=' text-sm'>(in progress)</span>}
+          </div>
+        )}
+        {user && (post.user.username === user.username || isAdmin) && <div onClick={handleDelete} className=' flex items-center gap-2 py-2 text-sm 
+        cursor-pointer'>
             <span>❌</span>
             <span>Delete this Post</span>
             {deleteMutation.isPending && <span className=' text-sm'>(in progress)</span>}
